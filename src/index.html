@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tauri App</title>
+    <style>
+      .logo.vanilla:hover {
+        filter: drop-shadow(0 0 2em #ffe21c);
+      }
+    </style>
+    <script src="/vue.global.js" >
+      Vue.config.productionTip =false;
+    </script>
+    <link href="/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    </head>
+
+  <body>
+    <!-- 这里是tab面板 切换不同的模块-->
+    <div class="w-100">
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true" @click="get_rule_list">主界面</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="print-tab" data-bs-toggle="tab" data-bs-target="#print-tab-pane" type="button" role="tab" aria-controls="print-tab-pane" aria-selected="false">打印机信息</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="rule-tab" data-bs-toggle="tab" data-bs-target="#rule-tab-pane" type="button" role="tab" aria-controls="rule-tab-pane" aria-selected="false">规则</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="setting-tab" data-bs-toggle="tab" data-bs-target="#setting-tab-pane" type="button" role="tab" aria-controls="setting-tab-pane" aria-selected="false">设置</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop" aria-controls="offcanvasTop">关于</button>
+        </li>
+      </ul>
+
+      <div class="tab-content w-100" id="myTabContent" >
+        <div class="tab-pane fade show active w-100" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+          <!--主界面 实现添加打印机 已存在的打印机列表 选择规则的功能-->
+          <div id="prints" class="mx-auto" style="width: 100%;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">链接</th>
+                  <th scope="col">位置</th>
+                  <th scope="col">规则</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr  v-for="printmsg in prints">
+                  <th  v-for="item in printmsg">{{item}}</th>
+                </tr>
+              </tbody>
+            </table>
+            <p>{{printmsg}}</p>
+            <div class="input-group mb-5 mx-auto w-100">
+              <input type="text" placeholder="打印机页面网址" aria-label="" v-model="url">
+              <input type="text" placeholder="打印机位置" aria-label="" v-model="printname">
+              <!--<input type="text" placeholder="使用匹配规则" aria-label="" v-model="rulename"-->
+              <select class="form-select" v-model="rulename">
+                <option value="1" v-for="item in rulenamelist">{{item}}</option>
+              </select>
+              <button  @click="add_print">添加打印机</button>
+              <button  @click="del_print">删除打印机</button>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="print-tab-pane" role="tabpanel" aria-labelledby="print-tab" tabindex="0">
+          <!--打印机信息 进入此界面 显示进度条 倒计时5s-->
+          <div id="printsdata">
+            <div class="d-grid gap-2">
+              <button class="btn btn-primary" @click="get_prints_data">刷新</button>
+            </div>
+            <div style="overflow:scroll;">
+              <table class="table"v-for="item in datas">
+                <thead>
+                    <tr>
+                        <th v-for="it in item">{{it[0]}}</th>
+                      </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td v-for="it in item">{{it[1]}}</td>
+                      </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="rule-tab-pane" role="tabpanel" aria-labelledby="rule-tab" tabindex="0">
+          <!--规则面板 使用列表显示现有规则 其中表格为 序号 规则名称 规则-->
+          <div id="rules" class="mx-auto" style="width: 100%;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">规则名称</th>
+                  <th scope="col">规则内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr  v-for="rule in rules">
+                  <th  v-for="item in rule">{{item}}</th>
+                </tr>
+              </tbody>
+            </table>
+            <p>{{rulemsg}}</p>
+            <div class="input-group mb-3 mx-auto">
+              <input type="text" placeholder="规则名称" aria-label="" v-model="rulename">
+              <input type="text" placeholder="匹配规则" aria-label="" v-model="rule">
+              <button  @click="add_rule">添加规则</button>
+              <button  @click="del_rule">删除规则</button>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="setting-tab-pane" role="tabpanel" aria-labelledby="setting-tab" tabindex="0">
+          <!--设置面板 设置超时时间-->
+
+        </div>
+      </div>
+      <!--这里师弹出式关于界面-->
+      <div class="offcanvas offcanvas-top" tabindex="-1" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasTopLabel">关于</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          开发者 email:len@coire.cn
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="/index.js" ></script>
+
+</html>
