@@ -62,7 +62,8 @@
               <input type="text" placeholder="打印机位置" aria-label="" v-model="printname">
               <!--<input type="text" placeholder="使用匹配规则" aria-label="" v-model="rulename"-->
               <select class="form-select" v-model="rulename">
-                <option value="1" v-for="item in rulenamelist">{{item}}</option>
+                <option disabled value="">选择规则</option>
+                <option  v-for="item in rulenamelist">{{item}}</option>
               </select>
               <button  @click="add_print">添加打印机</button>
               <button  @click="del_print">删除打印机</button>
